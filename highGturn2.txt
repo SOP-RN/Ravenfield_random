@@ -1,0 +1,63 @@
+behaviour("highGturn")
+
+function highGturn:Start()
+	self.dataContainer = self.gameObject.GetComponent(DataContainer)
+	self.vehicle = self.gameObject.GetComponent(Vehicle)
+	self.PDCurve = self.dataContainer.GetAnimationCurve("PD")
+	self.PCurve = self.dataContainer.GetAnimationCurve("P")
+	self.YCurve = self.dataContainer.GetAnimationCurve("Y")
+	self.RCurve = self.dataContainer.GetAnimationCurve("R")
+	self.ACCurve = self.dataContainer.GetAnimationCurve("AC")
+	self.ACTDCurve = self.dataContainer.GetAnimationCurve("ACTD")
+	self.ACTUCurve = self.dataContainer.GetAnimationCurve("ACTU")
+
+
+
+end
+
+function highGturn:Update()
+	self.isHighGTurnActive = Input.GetKey(KeyCode.Space) and self.vehicle.playerIsInside
+
+end
+
+function highGturn:FixedUpdate()
+    local perpendicularDrag = 2.0
+    local yawSensitivity = 2.0
+    local pitchSensitivity = 2.0
+    local rollSensitivity = 2.0
+    local acceleration = 2.0
+    local accelerationThrottleDown = 2.0
+    local accelerationThrottleUp = 2.0
+
+
+    if self.isHighGTurnActive then
+         local velMagnitude = self.vehicle.rigidbody.velocity.magnitude
+        perpendicularDrag, yawSensitivity, pitchSensitivity, rollSensitivity, acceleration, accelerationThrottleDown, accelerationThrottleUp = self:GetCurve(velMagnitude)
+    end
+
+    self:SetVehicleDrag(perpendicularDrag, yawSensitivity, pitchSensitivity, rollSensitivity, acceleration, accelerationThrottleDown, accelerationThrottleUp)
+end
+
+function highGturn:GetCurve(velMagnitude)
+    local PD = self.PDCurve.Evaluate(velMagnitude)
+    local Y = self.YCurve.Evaluate(velMagnitude)
+    local P = self.PCurve.Evaluate(velMagnitude)
+    local R = self.RCurve.Evaluate(velMagnitude)
+    local AC = self.ACCurve.Evaluate(velMagnitude)
+    local ACTD = self.ACTDCurve.Evaluate(velMagnitude)
+    local ACTU = self.ACTUCurve.Evaluate(velMagnitude)
+    print("Hello World")
+
+    return 0.8 * PD, 2 * Y, 1.7 * P, 2 * R, 1 * AC, 0.9 * ACTD, 1 * ACTU
+end
+
+function highGturn:SetVehicleDrag(perpendicularDrag, yawSensitivity, pitchSensitivity, rollSensitivity, acceleration, accelerationThrottleDown, accelerationThrottleUp)
+    self.vehicle.perpendicularDrag = perpendicularDrag
+    self.vehicle.yawSensitivity = yawSensitivity
+    self.vehicle.pitchSensitivity = pitchSensitivity
+    self.vehicle.rollSensitivity = rollSensitivity
+    self.vehicle.acceleration = acceleration
+    self.vehicle.accelerationThrottleDown = accelerationThrottleDown
+    self.vehicle.accelerationThrottleUp = accelerationThrottleUp
+
+end

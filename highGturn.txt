@@ -1,0 +1,21 @@
+	behaviour("highGturn")
+	--local instance
+	function highGturn:Start()
+		self.dataContainer = self.gameObject.GetComponent(DataContainer)
+		self.vehicle = self.gameObject.GetComponent(Vehicle)
+		self.ADMCurve = self.dataContainer.GetAnimationCurve("ADM")
+		self.DMCurve = self.dataContainer.GetAnimationCurve("DM")
+	end
+
+	function highGturn:Update()
+		if Input.GetKey(KeyCode.Space) and self.vehicle.playerIsInside then
+			local vel = self.vehicle.rigidbody.velocity.magnitude
+			local DM = self.DMCurve.Evaluate(vel)
+			local ADM = self.ADMCurve.Evaluate(vel)
+			self.vehicle.rigidbody.drag = 0.2 * DM
+			self.vehicle.rigidbody.angularDrag = 2 * ADM
+		else
+			 self.vehicle.rigidbody.drag = 0.2
+			 self.vehicle.rigidbody.angularDrag = 2
+			end
+	end

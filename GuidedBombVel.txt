@@ -1,0 +1,21 @@
+behaviour("GuidedBombVel")
+
+function GuidedBombVel:Start()
+	self.projectile = self.targets.projectile.GetComponent(Projectile)
+	
+	if self.projectile ~= nil and not self.projectile.isTargetSeekingMissileProjectile then
+		self:DestroyScript()
+	end		
+end
+
+function GuidedBombVel:Update()
+
+        local speed = 1
+        local target = self.projectile.currentTarget
+        local velocity = Vector3.zero
+
+       velocity = self.projectile.killCredit.velocity        
+       self.projectile.velocity = velocity * 1.1
+	self.onceDestroyScript = true
+    GameObject.Destroy(self.script)
+end
